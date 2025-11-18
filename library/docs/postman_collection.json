@@ -1,0 +1,94 @@
+{
+  "info": {
+    "name": "Library API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get Token (admin)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"123\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/token/",
+          "host": ["{{base_url}}"],
+          "path": ["api", "token"]
+        }
+      }
+    },
+    {
+      "name": "GET /books (public)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/books/",
+          "host": ["{{base_url}}"],
+          "path": ["api", "books"]
+        }
+      }
+    },
+    {
+      "name": "Search books (\"война\")",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/books/?search=война",
+          "host": ["{{base_url}}"],
+          "path": ["api", "books"],
+          "query": [
+            { "key": "search", "value": "война" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "POST /books (admin only)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Token {{auth_token}}" }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "title", "value": "Война и мир", "type": "text" },
+            { "key": "author", "value": "1", "type": "text" },
+            { "key": "year", "value": "1869", "type": "text" },
+            { "key": "genre", "value": "роман", "type": "text" },
+            { "key": "category", "value": "художественная литература", "type": "text" },
+            { "key": "publisher", "value": "Русский вестник", "type": "text" },
+            { "key": "book_type", "value": "fiction", "type": "text" },
+            {
+              "key": "book_file",
+              "type": "file",
+              "src": "/path/to/test.pdf"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/api/books/",
+          "host": ["{{base_url}}"],
+          "path": ["api", "books"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "auth_token",
+      "value": ""
+    }
+  ]
+}
