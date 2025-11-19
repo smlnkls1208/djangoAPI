@@ -1,5 +1,18 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.db import models
+
+class Genre(models.Model):
+    name = models.CharField("Название жанра", max_length=100, unique=True)
+
+    class Meta:
+        verbose_name = "Жанр"
+        verbose_name_plural = "Жанры"
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
 
 class Author(models.Model):
     name = models.CharField("Имя автора", max_length=200, unique=True)
@@ -28,7 +41,12 @@ class Book(models.Model):
         verbose_name="Автор"
     )
     year = models.PositiveIntegerField("Год выпуска")
-    genre = models.CharField("Жанр", max_length=100)
+    genre = models.ForeignKey(
+        Genre,
+        on_delete=models.PROTECT,
+        related_name='books',
+        verbose_name="Жанр"
+    )
     category = models.CharField("Категория", max_length=100)
     publisher = models.CharField("Издательство", max_length=100)
     cover_image = models.ImageField(

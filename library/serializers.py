@@ -1,9 +1,15 @@
 from django.core.exceptions import ValidationError as DjangoValidationError
 import rest_framework
 from rest_framework.exceptions import ValidationError
-from .models import Author, Book
 import mimetypes
 from rest_framework import serializers
+from .models import Author, Book, Genre
+
+class GenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Genre
+        fields = ['id', 'name']
+
 
 class AuthorSerializer(serializers.ModelSerializer):
     books = serializers.SerializerMethodField()
@@ -36,17 +42,20 @@ def validate_book_file(file):
 
 class BookSerializer(serializers.ModelSerializer):
     author_name = serializers.CharField(source='author.name', read_only=True)
+    genre_name = serializers.CharField(source='genre.name', read_only=True)
     cover_image = serializers.ImageField(required=False, allow_null=True)
     book_file = serializers.FileField(validators=[validate_book_file])
+
 
     class Meta:
         model = Book
         fields = [
-            'id', 'title', 'author', 'author_name', 'year', 'genre',
+            'id', 'title', 'author', 'author_name',
+            'year', 'genre', 'genre_name',
             'category', 'publisher', 'cover_image', 'book_file',
             'book_type'
         ]
-        # author — для записи (ID), author_name — для чтения
+
 
     def validate_year(self, value):
         if not (1000 <= value <= 9999):
