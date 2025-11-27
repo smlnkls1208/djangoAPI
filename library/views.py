@@ -23,6 +23,7 @@ class BookViewSet(viewsets.ModelViewSet):
     filter_backends = [SearchFilter]
     search_fields = ['title', 'genre', 'category', 'publisher', 'author__name']
 
+    # доступно всем 'list', 'retrieve'
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [permissions.AllowAny()]

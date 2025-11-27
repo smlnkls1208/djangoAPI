@@ -51,6 +51,7 @@ class BookSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Год должен быть в диапазоне от 1000 до 9999.")
         return value
 
+    # уникальность
     def validate(self, data):
         title = data.get('title')
         author = data.get('author')

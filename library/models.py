@@ -1,5 +1,6 @@
 from django.db import models
 
+# Модель автора, уникальна по наименованию
 class Author(models.Model):
     name = models.CharField("Имя автора", max_length=200, unique=True)
     biography = models.TextField("Биография", blank=True)
@@ -12,7 +13,7 @@ class Author(models.Model):
         verbose_name_plural = "Авторы"
         ordering = ['name']
 
-
+# Модель книги. Уникальна по многим критериям. Два типа
 class Book(models.Model):
     TYPE_CHOICES = [
         ('fiction', 'Художественное произведение'),
