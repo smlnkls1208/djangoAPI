@@ -1,18 +1,4 @@
 from django.db import models
-from django.core.exceptions import ValidationError
-from django.db import models
-
-class Genre(models.Model):
-    name = models.CharField("Название жанра", max_length=100, unique=True)
-
-    class Meta:
-        verbose_name = "Жанр"
-        verbose_name_plural = "Жанры"
-        ordering = ['name']
-
-    def __str__(self):
-        return self.name
-
 
 class Author(models.Model):
     name = models.CharField("Имя автора", max_length=200, unique=True)
@@ -41,12 +27,7 @@ class Book(models.Model):
         verbose_name="Автор"
     )
     year = models.PositiveIntegerField("Год выпуска")
-    genre = models.ForeignKey(
-        Genre,
-        on_delete=models.PROTECT,
-        related_name='books',
-        verbose_name="Жанр"
-    )
+    genre = models.CharField("Жанр", max_length=100)
     category = models.CharField("Категория", max_length=100)
     publisher = models.CharField("Издательство", max_length=100)
     cover_image = models.ImageField(
@@ -75,27 +56,3 @@ class Book(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.year}) — {self.author.name}"
-
-    def clean(self):
-        super().clean()
-
-        if self.book_type == 'textbook':
-            existing = Book.objects.filter(
-                title=self.title,
-                author=self.author,
-                publisher=self.publisher,
-                book_type='textbook'
-            )
-            if self.pk:
-                existing = existing.exclude(pk=self.pk)
-
-            same_edition = existing.filter(year=self.year).exists()
-            if same_edition:
-                raise ValidationError(
-                    "Учебник с таким названием, автором и издательством уже существует в этом году. "
-                    "Добавление разрешено только для нового издания (изменённый год)."
-                )
-
-    def save(self, *args, **kwargs):
-        self.full_clean()  # вызывает clean()
-        super().save(*args, **kwargs)

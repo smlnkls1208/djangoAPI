@@ -1,29 +1,8 @@
-from django.core.exceptions import ValidationError as DjangoValidationError
-import rest_framework
-from rest_framework.exceptions import ValidationError
 import mimetypes
 from rest_framework import serializers
-from .models import Author, Book, Genre
-
-class GenreSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Genre
-        fields = ['id', 'name']
-
-
-class AuthorSerializer(serializers.ModelSerializer):
-    books = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Author
-        fields = ['id', 'name', 'biography', 'books']
-
-    def get_books(self, obj):
-        return [
-            {"id": book.id, "title": book.title}
-            for book in obj.books.all()
-        ]
-
+from rest_framework.exceptions import ValidationError
+from django.core.exceptions import ValidationError as DjangoValidationError
+from .models import Author, Book
 
 def validate_book_file(file):
     mime_type, _ = mimetypes.guess_type(file.name)
@@ -40,22 +19,32 @@ def validate_book_file(file):
         raise ValidationError("Файл слишком большой. Максимум — 50 МБ.")
 
 
+class AuthorSerializer(serializers.ModelSerializer):
+    books = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Author
+        fields = ['id', 'name', 'biography', 'books']
+
+    def get_books(self, obj):
+        return [
+            {"id": book.id, "title": book.title}
+            for book in obj.books.all()
+        ]
+
+
 class BookSerializer(serializers.ModelSerializer):
     author_name = serializers.CharField(source='author.name', read_only=True)
-    genre_name = serializers.CharField(source='genre.name', read_only=True)
     cover_image = serializers.ImageField(required=False, allow_null=True)
     book_file = serializers.FileField(validators=[validate_book_file])
-
 
     class Meta:
         model = Book
         fields = [
             'id', 'title', 'author', 'author_name',
-            'year', 'genre', 'genre_name',
-            'category', 'publisher', 'cover_image', 'book_file',
-            'book_type'
+            'year', 'genre', 'category', 'publisher',
+            'cover_image', 'book_file', 'book_type'
         ]
-
 
     def validate_year(self, value):
         if not (1000 <= value <= 9999):
@@ -79,11 +68,16 @@ class BookSerializer(serializers.ModelSerializer):
                 queryset = queryset.exclude(pk=self.instance.pk)
 
             if queryset.exists():
-                raise ValidationError({
-                    'non_field_errors': [
-                        "Книга с таким названием, автором, годом и издательством уже существует."
-                    ]
-                })
+                existing = queryset.first()
+                msg = (
+                    f"Запись с таким сочетанием «{title}», автор «{author.name}», "
+                    f"год «{year}», издательство «{publisher}» уже существует (ID: {existing.id})."
+                )
+                if existing.book_type == 'textbook':
+                    msg += " Для учебников допускаются только новые издания (изменённый год или издательство)."
+                else:
+                    msg += " Для художественных произведений допускаются другие издательства или годы."
+                raise ValidationError({'non_field_errors': [msg]})
 
         return data
 

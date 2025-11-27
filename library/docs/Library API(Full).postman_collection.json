@@ -1,0 +1,681 @@
+{
+	"info": {
+		"_postman_id": "a20dc50e-17b5-4073-af54-acafd7204c10",
+		"name": "Library API(Full)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48552701",
+		"_collection_link": "https://al89994950059-4794340.postman.co/workspace/%D0%90%D0%BB%D0%B5%D1%81%D1%8F-%D0%A1%D0%B0%D0%BC%D0%BE%D0%B9%D0%BB%D0%B5%D0%BD%D0%BA%D0%BE's-Workspace~b3a9308f-be5e-4186-8bd7-fa84e95e64ae/collection/48552701-a20dc50e-17b5-4073-af54-acafd7204c10?action=share&source=collection_link&creator=48552701"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Get Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/token/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"token",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Books",
+			"item": [
+				{
+					"name": "GET book list",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/books",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"books"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET book",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/books/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"books",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search title",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/books?search=Война",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"books"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "Война"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search genre",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/books?search=роман",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"books"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "роман"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search author",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/books?search=Толстой",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"books"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "Толстой"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Authors",
+			"item": [
+				{
+					"name": "GET authors list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/authors",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"authors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET author",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/authors/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"authors",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "POST book",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Собачье сердце",
+									"type": "text"
+								},
+								{
+									"key": "author",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "year",
+									"value": "1967",
+									"type": "text"
+								},
+								{
+									"key": "genre",
+									"value": "фантастика",
+									"type": "text"
+								},
+								{
+									"key": "category",
+									"value": "роман",
+									"type": "text"
+								},
+								{
+									"key": "publisher",
+									"value": "Москва",
+									"type": "text"
+								},
+								{
+									"key": "book_type",
+									"value": "fiction",
+									"type": "text"
+								},
+								{
+									"key": "book_file",
+									"type": "file",
+									"src": "postman-cloud:///1f0cb4de-31c2-4c00-84f4-d8d13bf8eb61"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/books/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"books",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST book",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Алгебра. 9 класс",
+									"type": "text"
+								},
+								{
+									"key": "author",
+									"value": "3",
+									"type": "text"
+								},
+								{
+									"key": "year",
+									"value": "2023",
+									"type": "text"
+								},
+								{
+									"key": "genre",
+									"value": "учебное пособие",
+									"type": "text"
+								},
+								{
+									"key": "category",
+									"value": "учебник",
+									"type": "text"
+								},
+								{
+									"key": "publisher",
+									"value": "Просвещение",
+									"type": "text"
+								},
+								{
+									"key": "book_type",
+									"value": "textbook",
+									"type": "text"
+								},
+								{
+									"key": "book_file",
+									"type": "file",
+									"src": "/D:/Загрузки/a7ab7123-b026-4495-8ef8-870b3fd4675d_Требования к лр (1).pdf"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/books/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"books",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST book duplicate",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Алгебра. 9 класс",
+									"type": "text"
+								},
+								{
+									"key": "author",
+									"value": "3",
+									"type": "text"
+								},
+								{
+									"key": "year",
+									"value": "2022",
+									"type": "text"
+								},
+								{
+									"key": "genre",
+									"value": "учебное пособие",
+									"type": "text"
+								},
+								{
+									"key": "category",
+									"value": "учебник",
+									"type": "text"
+								},
+								{
+									"key": "publisher",
+									"value": "Просвещение",
+									"type": "text"
+								},
+								{
+									"key": "book_type",
+									"value": "textbook",
+									"type": "text"
+								},
+								{
+									"key": "book_file",
+									"type": "file",
+									"src": "/D:/Загрузки/Требования к лр (1).pdf"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/books/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"books",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST invalid year",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Очень старая книга",
+									"type": "text"
+								},
+								{
+									"key": "author",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "year",
+									"value": "999",
+									"type": "text"
+								},
+								{
+									"key": "genre",
+									"value": "фантастика",
+									"type": "text"
+								},
+								{
+									"key": "publisher",
+									"value": "Издатель",
+									"type": "text"
+								},
+								{
+									"key": "book_type",
+									"value": "fiction",
+									"type": "text"
+								},
+								{
+									"key": "book_file",
+									"type": "file",
+									"src": "/D:/Загрузки/Требования к лр (1).pdf"
+								},
+								{
+									"key": "category",
+									"value": "художественная литература",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/books/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"books",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST no token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Тест",
+									"type": "text"
+								},
+								{
+									"key": "author",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "year",
+									"value": "2025",
+									"type": "text"
+								},
+								{
+									"key": "book_type",
+									"value": "fiction",
+									"type": "text"
+								},
+								{
+									"key": "book_file",
+									"type": "file",
+									"src": "/path/to/test.pdf"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/books/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"books",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Auto-extract token from 'Get Token' response and set to {{auth_token}}",
+					"if (request.name === 'Get Token (admin)') {",
+					"  pm.test('Get token', function () {",
+					"    var jsonData = pm.response.json();",
+					"    pm.globals.set('auth_token', jsonData.token);",
+					"    pm.variables.set('auth_token', jsonData.token);",
+					"  });",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:8000"
+		},
+		{
+			"key": "auth_token",
+			"value": ""
+		}
+	]
+}

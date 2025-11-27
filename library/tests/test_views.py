@@ -3,86 +3,163 @@ from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from rest_framework import status
 from library.models import Author, Book
-import tempfile
-import os
+from django.core.files.uploadedfile import SimpleUploadedFile
 
-class BookViewSetTest(TestCase):
+
+class BookAPITest(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.admin_user = User.objects.create_superuser(
-            username='admin',
-            email='admin@mail.com',
-            password='123'
+        self.admin = User.objects.create_superuser(
+            username='admin', password='admin123'
         )
-        self.regular_user = User.objects.create_user(
-            username='user',
-            password='123'
+        self.user = User.objects.create_user(
+            username='user', password='user123'
         )
-        self.author = Author.objects.create(name="Лев Толстой")
+        self.author = Author.objects.create(name="Антуан де Сент-Экзюпери")
 
-        self.pdf_file = tempfile.NamedTemporaryFile(suffix='.pdf', delete=False)
-        self.pdf_file.write(b'%PDF-1.4\n')
-        self.pdf_file.close()
-
-    def tearDown(self):
-        if os.path.exists(self.pdf_file.name):
-            os.unlink(self.pdf_file.name)
+    def get_pdf(self, name="book.pdf"):
+        return SimpleUploadedFile(
+            name=name,
+            content=b'%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\nxref\n0 3\n0000000000 65535 f\n0000000010 00000 n\n0000000053 00000 n\ntrailer<</Size 3/Root 1 0 R>>\nstartxref\n102\n%%EOF',
+            content_type='application/pdf'
+        )
 
     def test_admin_can_create_book(self):
-        self.client.force_authenticate(user=self.admin_user)
-        with open(self.pdf_file.name, 'rb') as f:
-            response = self.client.post('/api/books/', {
-                'title': 'Анна Каренина',
-                'author': self.author.id,
-                'year': 1877,
-                'genre': 'роман',
-                'category': 'художественная литература',
-                'publisher': 'Русский вестник',
-                'book_file': f,
-                'book_type': 'fiction'
-            })
+        self.client.force_authenticate(user=self.admin)
+        response = self.client.post('/api/books/', {
+            'title': 'Маленький принц',
+            'author': self.author.id,
+            'year': 1943,
+            'genre': 'аллегория',
+            'category': 'повесть',
+            'publisher': 'Gallimard',
+            'book_file': self.get_pdf("prince.pdf"),
+            'book_type': 'fiction'
+        })
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Book.objects.count(), 1)
 
     def test_regular_user_cannot_create_book(self):
-        self.client.force_authenticate(user=self.regular_user)
-        with open(self.pdf_file.name, 'rb') as f:
-            response = self.client.post('/api/books/', {
-                'title': 'Тест',
-                'author': self.author.id,
-                'year': 2025,
-                'book_file': f,
-                'book_type': 'fiction'
-            })
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post('/api/books/', {
+            'title': 'Тест',
+            'author': self.author.id,
+            'year': 2025,
+            'genre': 'тест',
+            'category': 'тест',
+            'publisher': 'Тест',
+            'book_file': self.get_pdf("test.pdf"),
+            'book_type': 'fiction'
+        })
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_anyone_can_read_books(self):
         Book.objects.create(
-            title="Война и мир",
+            title="Маленький принц",
             author=self.author,
-            year=1869,
-            genre="роман",
-            category="художественная литература",
-            publisher="Русский вестник",
-            book_file="fake.pdf",
+            year=1943,
+            genre="аллегория",
+            category="повесть",
+            publisher="Gallimard",
+            book_file=self.get_pdf("prince2.pdf"),
             book_type='fiction'
         )
         response = self.client.get('/api/books/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data['results']), 1)
 
     def test_search_books(self):
         Book.objects.create(
-            title="Мастер и Маргарита",
+            title="Преступление и наказание",
             author=self.author,
-            year=1967,
-            genre="фантастика",
+            year=1866,
+            genre="психологический роман",
             category="роман",
-            publisher="Москва",
-            book_file="fake.pdf",
+            publisher="Русский вестник",
+            book_file=self.get_pdf("crime.pdf"),
             book_type='fiction'
         )
-        response = self.client.get('/api/books/?search=Мастер')
+        response = self.client.get('/api/books/?search=Преступление')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
-        self.assertIn('Мастер', response.data[0]['title'])
+        self.assertGreater(len(response.data['results']), 0)
+        self.assertIn('Преступление', response.data['results'][0]['title'])
+
+    def test_invalid_year_rejected(self):
+        self.client.force_authenticate(user=self.admin)
+        response = self.client.post('/api/books/', {
+            'title': 'Тест',
+            'author': self.author.id,
+            'year': 999,
+            'genre': 'роман',
+            'category': 'тест',
+            'publisher': 'Издатель',
+            'book_file': self.get_pdf("bad_year.pdf"),
+            'book_type': 'fiction'
+        })
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('Год должен быть', str(response.data))
+
+    def test_duplicate_rejected_via_api(self):
+        self.client.force_authenticate(user=self.admin)
+        data = {
+            'title': 'Дубль',
+            'author': self.author.id,
+            'year': 2020,
+            'genre': 'тест',
+            'category': 'тест',
+            'publisher': 'Тест',
+            'book_file': self.get_pdf("dup1.pdf"),
+            'book_type': 'fiction'
+        }
+        response1 = self.client.post('/api/books/', data)
+        self.assertEqual(response1.status_code, 201)
+
+        # Важно: новый файл, иначе будет "empty file"
+        data2 = {**data, 'book_file': self.get_pdf("dup2.pdf")}
+        response2 = self.client.post('/api/books/', data2)
+        self.assertEqual(response2.status_code, 400)
+        self.assertIn('уже существует', str(response2.data).lower())
+
+    def test_textbook_edition_logic_via_api(self):
+        self.client.force_authenticate(user=self.admin)
+        base = {
+            'title': 'Физика. 10 кл.',
+            'author': self.author.id,
+            'genre': 'учебное пособие',
+            'category': 'учебник',
+            'book_type': 'textbook'
+        }
+
+        response1 = self.client.post('/api/books/', {
+            **base,
+            'year': 2020,
+            'publisher': 'Просвещение',
+            'book_file': self.get_pdf("phys1.pdf")
+        })
+        self.assertEqual(response1.status_code, 201)
+
+        response2 = self.client.post('/api/books/', {
+            **base,
+            'year': 2020,
+            'publisher': 'Просвещение',
+            'book_file': self.get_pdf("phys2.pdf")  # ← новый файл!
+        })
+        self.assertEqual(response2.status_code, 400)
+
+        response3 = self.client.post('/api/books/', {
+            **base,
+            'year': 2022,
+            'publisher': 'Просвещение',
+            'book_file': self.get_pdf("phys3.pdf")
+        })
+        self.assertEqual(response3.status_code, 201)
+
+        response4 = self.client.post('/api/books/', {
+            **base,
+            'year': 2020,
+            'publisher': 'Дрофа',
+            'book_file': self.get_pdf("phys4.pdf")
+        })
+        self.assertEqual(response4.status_code, 201)
+
+        self.assertEqual(Book.objects.filter(title='Физика. 10 кл.').count(), 3)

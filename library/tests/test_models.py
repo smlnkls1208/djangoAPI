@@ -1,11 +1,12 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from library.models import Author, Book
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 
 class AuthorModelTest(TestCase):
     def test_create_author(self):
-        author = Author.objects.create(name="Михаил Булгаков", biography="его жена Олимпиада")
+        author = Author.objects.create(name="Михаил Булгаков", biography="Автор 'Мастера и Маргариты'")
         self.assertEqual(str(author), "Михаил Булгаков")
         self.assertEqual(author.name, "Михаил Булгаков")
 
@@ -17,69 +18,51 @@ class AuthorModelTest(TestCase):
 
 class BookModelTest(TestCase):
     def setUp(self):
-        self.author = Author.objects.create(name="Маргарет Митчелл")
+        self.author = Author.objects.create(name="Лев Толстой")
+        self.pdf = SimpleUploadedFile("test.pdf", b"%PDF-1.4\ncontent")
 
     def test_create_fiction_book(self):
         book = Book.objects.create(
-            title="Унесенные ветром",
+            title="Анна Каренина",
             author=self.author,
-            year=1936,
+            year=1877,
             genre="роман",
-            category="историческая художественная литература",
-            publisher="Macmillan Publishers",
-            book_file="test.pdf",
+            category="художественная литература",
+            publisher="Русский вестник",
+            book_file=self.pdf,
             book_type='fiction'
         )
-        self.assertEqual(str(book), "Унесенные ветром (1936) — Маргарет Митчелл")
+        self.assertEqual(str(book), "Анна Каренина (1877) — Лев Толстой")
 
-    def test_unique_together_violation(self):
+    def test_unique_together_constraint(self):
+
         common = {
             'author': self.author,
-            'year': 1936,
+            'year': 2020,
             'genre': 'роман',
-            'category': 'историческая художественная литература',
-            'publisher': 'Macmillan Publishers',
-            'book_file': 'test.pdf',
+            'category': 'художественная литература',
+            'publisher': 'Эксмо',
+            'book_file': self.pdf,
             'book_type': 'fiction'
         }
-        Book.objects.create(title="Алгебра. 9 класс", **common)
-        with self.assertRaises(Exception):
-            Book.objects.create(title="Алгебра. 9 класс", **common)
-
-    def test_textbook_same_edition_rejection(self):
-        common = {
-            'title': "Физика. 10 класс",
-            'author': self.author,
-            'genre': 'наука',
-            'category': 'учебник',
-            'publisher': 'Дрофа',
-            'book_file': 'fake.pdf',
-            'book_type': 'textbook'
-        }
-        Book.objects.create(year=2022, **common)
+        Book.objects.create(title="Война и мир", **common)
 
         with self.assertRaises(Exception) as cm:
-            Book.objects.create(year=2022, **common)
+            Book.objects.create(title="Война и мир", **common)
+        self.assertIn('unique', str(cm.exception).lower())
 
-        self.assertIsNotNone(cm.exception)
+    def test_different_editions_allowed(self):
 
-    def test_textbook_validation_error(self):
-        common = {
-            'title': "Физика. 10 класс",
+        base = {
+            'title': "Мастер и Маргарита",
             'author': self.author,
-            'year': 2022,
-            'genre': 'наука',
-            'category': 'учебник',
-            'publisher': 'Дрофа',
-            'book_file': 'fake.pdf',
-            'book_type': 'textbook'
+            'genre': "фантастика",
+            'category': "роман",
+            'book_file': self.pdf,
+            'book_type': 'fiction'
         }
+        Book.objects.create(year=1967, publisher="Москва", **base)
+        Book.objects.create(year=2020, publisher="Москва", **base)
+        Book.objects.create(year=1967, publisher="Азбука", **base)
 
-        Book.objects.create(**common)
-
-        duplicate_book = Book(**common)
-
-        with self.assertRaises(ValidationError) as cm:
-            duplicate_book.full_clean()
-
-        self.assertTrue(len(cm.exception.error_dict) > 0)
+        self.assertEqual(Book.objects.filter(title="Мастер и Маргарита").count(), 3)
