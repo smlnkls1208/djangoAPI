@@ -3,15 +3,17 @@ from rest_framework.filters import SearchFilter
 from .models import Author, Book
 from .serializers import AuthorSerializer, BookSerializer
 
+
+# класс реализующий методы
 class AuthorViewSet(viewsets.ModelViewSet):
-    queryset = Author.objects.all()
+    queryset = Author.objects.all()     # возвращает всех авторов
     serializer_class = AuthorSerializer
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.IsAdminUser]         # права доступа
     filter_backends = [SearchFilter]
     search_fields = ['name', 'biography']
 
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+        if self.action in ['list', 'retrieve']:          # просмотр доступен всем
             return [permissions.AllowAny()]
         return super().get_permissions()
 

@@ -61,7 +61,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-LANGUAGE_CODE = 'ru-ru'  # ← лучше русский, т.к. админка на русском
+LANGUAGE_CODE = 'ru-ru'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
@@ -74,10 +74,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.TokenAuthentication',         # поиск юзера по токену
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.AllowAny',     # каждый может делать запрос если во вьюхе разрешено
     ],
     'DEFAULT_FILTER_BACKENDS': [
         'rest_framework.filters.SearchFilter',

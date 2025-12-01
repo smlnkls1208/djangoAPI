@@ -7,12 +7,12 @@ from .models import Author, Book
 def validate_book_file(file):
     mime_type, _ = mimetypes.guess_type(file.name)
     if not mime_type:
-        raise ValidationError("Не удалось определить тип файла.")
+        raise ValidationError("Не удалось определить тип файла.")    # определяем тип файла
 
     allowed_types = ['application/pdf', 'application/epub+zip']
     if mime_type not in allowed_types:
         raise ValidationError(
-            f"Недопустимый тип файла: {mime_type}. Разрешены: PDF, EPUB."
+            f"Недопустимый тип файла: {mime_type}. Разрешены: PDF, EPUB."     # а здесь проверяем
         )
 
     if file.size > 50 * 1024 * 1024:
@@ -53,12 +53,12 @@ class BookSerializer(serializers.ModelSerializer):
 
     # уникальность
     def validate(self, data):
-        title = data.get('title')
+        title = data.get('title')     # гет чтобы не было ошибки если поле пустое
         author = data.get('author')
         year = data.get('year')
         publisher = data.get('publisher')
 
-        if all([title, author, year, publisher]):
+        if all([title, author, year, publisher]):    # ищет дубликаты по полям
             queryset = Book.objects.filter(
                 title=title,
                 author=author,
@@ -66,10 +66,10 @@ class BookSerializer(serializers.ModelSerializer):
                 publisher=publisher
             )
             if self.instance:
-                queryset = queryset.exclude(pk=self.instance.pk)
+                queryset = queryset.exclude(pk=self.instance.pk)      # исключает текущий объект
 
             if queryset.exists():
-                existing = queryset.first()
+                existing = queryset.first()               # выкидывает ошибку
                 msg = (
                     f"Запись с таким сочетанием «{title}», автор «{author.name}», "
                     f"год «{year}», издательство «{publisher}» уже существует (ID: {existing.id})."
@@ -84,6 +84,6 @@ class BookSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         try:
-            return super().create(validated_data)
+            return super().create(validated_data)    # защита от ошибок джанго, конвертация
         except DjangoValidationError as e:
             raise ValidationError(e.message_dict)

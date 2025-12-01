@@ -10,10 +10,10 @@ class BookAPITest(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.admin = User.objects.create_superuser(
-            username='admin', password='admin123'
+            username='admin', password='123'
         )
         self.user = User.objects.create_user(
-            username='user', password='user123'
+            username='user', password='123'
         )
         self.author = Author.objects.create(name="Антуан де Сент-Экзюпери")
 
@@ -114,7 +114,7 @@ class BookAPITest(TestCase):
         response1 = self.client.post('/api/books/', data)
         self.assertEqual(response1.status_code, 201)
 
-        # Важно: новый файл, иначе будет "empty file"
+        # новый файл, иначе будет емпти)
         data2 = {**data, 'book_file': self.get_pdf("dup2.pdf")}
         response2 = self.client.post('/api/books/', data2)
         self.assertEqual(response2.status_code, 400)
@@ -142,7 +142,7 @@ class BookAPITest(TestCase):
             **base,
             'year': 2020,
             'publisher': 'Просвещение',
-            'book_file': self.get_pdf("phys2.pdf")  # ← новый файл!
+            'book_file': self.get_pdf("phys2.pdf")
         })
         self.assertEqual(response2.status_code, 400)
 
